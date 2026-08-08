@@ -12,9 +12,7 @@ impl SIDE {
 }
 
 impl OrderFilter for SIDE {
-    fn init_bf(&self) {
-        
-    }
+    fn init_bf(&self) {}
     fn filter<'a>(
         &self,
         orders: &[Option<&'a (Order, bool, Option<Trigger>)>],

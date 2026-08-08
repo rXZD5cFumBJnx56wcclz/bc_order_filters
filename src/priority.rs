@@ -16,9 +16,7 @@ impl PRIORITY {
 }
 
 impl OrderFilter for PRIORITY {
-    fn init_bf(&self) {
-        
-    }
+    fn init_bf(&self) {}
     fn filter<'a>(
         &self,
         orders: &[Option<&'a (Order, bool, Option<Trigger>)>],
