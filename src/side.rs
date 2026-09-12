@@ -12,23 +12,17 @@ impl SIDE {
 }
 
 impl OrderFilter for SIDE {
-<<<<<<< HEAD
-    fn init_bf(&self) {
-        
-    }
-=======
     fn init_bf(&self) {}
->>>>>>> b50bdaf (release v0.2.0)
     fn filter<'a>(
         &self,
-        orders: &[Option<&'a (Order, bool, Option<Trigger>)>],
+        orders: &[Option<&'a OrderWrap>],
         _src: &[f64],
         _signals: &[Signal],
         _state: &TradeState,
-    ) -> Option<&'a (Order, bool, Option<Trigger>)> {
+    ) -> Option<&'a OrderWrap> {
         let order_wrap = orders[0];
         if let Some(order) = order_wrap {
-            if &order.0.side == &self.side {
+            if &order.order.side == &self.side {
                 return Some(order);
             }
         }
@@ -48,26 +42,24 @@ mod tests {
                 side: "buy".to_string()
             }
             .filter(
-                &[Some(&(
-                    Order {
+                &[Some(&OrderWrap {
+                    order: Order {
                         side: "buy".to_string(),
                         ..Default::default()
                     },
-                    Default::default(),
-                    Default::default(),
-                ))],
+                    ..Default::default()
+                })],
                 &[],
                 &[],
                 &Default::default()
             ),
-            Some(&(
-                Order {
+            Some(&OrderWrap {
+                order: Order {
                     side: "buy".to_string(),
                     ..Default::default()
                 },
-                Default::default(),
-                Default::default(),
-            ))
+                ..Default::default()
+            })
         )
     }
 

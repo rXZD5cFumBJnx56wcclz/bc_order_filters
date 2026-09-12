@@ -4,16 +4,16 @@ use std::any::Any;
 
 use bc_utils_lg::structs::{
     signals::Signal,
-    trade::{Order, TradeState, Trigger},
+    trade::{OrderWrap, TradeState},
 };
 
 pub trait OrderFilter: Any {
     fn init_bf(&self);
     fn filter<'a>(
         &self,
-        orders: &[Option<&'a (Order, bool, Option<Trigger>)>],
+        orders: &[Option<&'a OrderWrap>],
         src: &[f64],
         signals: &[Signal],
         state: &TradeState,
-    ) -> Option<&'a (Order, bool, Option<Trigger>)>;
+    ) -> Option<&'a OrderWrap>;
 }

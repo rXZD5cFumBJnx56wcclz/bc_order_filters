@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+/// a filter that allows you to set priority for simultaneous orders
 #[derive(Debug, Clone, Default)]
 pub struct PRIORITY {
     pub priority_in_position: usize,
@@ -15,52 +16,49 @@ impl PRIORITY {
     }
 }
 
+fn first_signal_order<'a>(orders: &[Option<&'a OrderWrap>]) -> Option<&'a OrderWrap> {
+    *orders
+        .iter()
+        .find(|v| {
+            if let Some(order) = v {
+                if order.order.side.as_str() != "hold" {
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        })
+        .unwrap_or(&orders[0])
+}
+
 impl OrderFilter for PRIORITY {
-<<<<<<< HEAD
-    fn init_bf(&self) {
-        
-    }
-=======
     fn init_bf(&self) {}
->>>>>>> b50bdaf (release v0.2.0)
     fn filter<'a>(
         &self,
-        orders: &[Option<&'a (Order, bool, Option<Trigger>)>],
+        orders: &[Option<&'a OrderWrap>],
         _src: &[f64],
         _signals: &[Signal],
         state: &TradeState,
-    ) -> Option<&'a (Order, bool, Option<Trigger>)> {
+    ) -> Option<&'a OrderWrap> {
         if orders
             .iter()
             .scan(0usize, |init, v| {
-                if v.is_some() && v.unwrap().0.side.as_str() != "hold" {
+                if v.is_some() && v.as_ref().unwrap().order.side.as_str() != "hold" {
                     *init += 1;
                 }
                 Some(*init)
             })
             .any(|v| v > 1)
         {
-            if state.positions.borrow().is_empty() {
+            return if state.positions.borrow().is_empty() {
                 orders[self.priority_out_of_position]
             } else {
                 orders[self.priority_in_position]
-            }
-        } else {
-            *orders
-                .iter()
-                .find(|v| {
-                    if let Some(order) = v {
-                        if order.0.side.as_str() != "hold" {
-                            true
-                        } else {
-                            false
-                        }
-                    } else {
-                        false
-                    }
-                })
-                .unwrap_or(&orders[0])
+            };
         }
+        first_signal_order(orders)
     }
 }
 
@@ -78,38 +76,35 @@ mod tests {
             }
             .filter(
                 &[
-                    Some(&(
-                        Order {
+                    Some(&OrderWrap {
+                        order: Order {
                             side: "buy".to_string(),
                             qty: 1.,
                             ..Default::default()
                         },
-                        Default::default(),
-                        Default::default()
-                    )),
-                    Some(&(
-                        Order {
+                        ..Default::default()
+                    }),
+                    Some(&OrderWrap {
+                        order: Order {
                             side: "buy".to_string(),
                             qty: 2.,
                             ..Default::default()
                         },
-                        Default::default(),
-                        Default::default()
-                    )),
+                        ..Default::default()
+                    }),
                 ],
                 &[],
                 &[],
                 &Default::default()
             ),
-            Some(&(
-                Order {
+            Some(&OrderWrap {
+                order: Order {
                     side: "buy".to_string(),
                     qty: 2.,
                     ..Default::default()
                 },
-                Default::default(),
-                Default::default()
-            ))
+                ..Default::default()
+            })
         );
     }
 
@@ -122,38 +117,35 @@ mod tests {
             }
             .filter(
                 &[
-                    Some(&(
-                        Order {
+                    Some(&OrderWrap {
+                        order: Order {
                             side: "hold".to_string(),
                             qty: 1.,
                             ..Default::default()
                         },
-                        Default::default(),
-                        Default::default()
-                    )),
-                    Some(&(
-                        Order {
+                        ..Default::default()
+                    }),
+                    Some(&OrderWrap {
+                        order: Order {
                             side: "hold".to_string(),
                             qty: 2.,
                             ..Default::default()
                         },
-                        Default::default(),
-                        Default::default()
-                    )),
+                        ..Default::default()
+                    }),
                 ],
                 &[],
                 &[],
                 &Default::default()
             ),
-            Some(&(
-                Order {
+            Some(&OrderWrap {
+                order: Order {
                     side: "hold".to_string(),
                     qty: 1.,
                     ..Default::default()
                 },
-                Default::default(),
-                Default::default()
-            ))
+                ..Default::default()
+            })
         );
     }
 
@@ -166,38 +158,35 @@ mod tests {
             }
             .filter(
                 &[
-                    Some(&(
-                        Order {
+                    Some(&OrderWrap {
+                        order: Order {
                             side: "buy".to_string(),
                             qty: 1.,
                             ..Default::default()
                         },
-                        Default::default(),
-                        Default::default()
-                    )),
-                    Some(&(
-                        Order {
+                        ..Default::default()
+                    }),
+                    Some(&OrderWrap {
+                        order: Order {
                             side: "buy".to_string(),
                             qty: 2.,
                             ..Default::default()
                         },
-                        Default::default(),
-                        Default::default()
-                    )),
+                        ..Default::default()
+                    }),
                 ],
                 &[],
                 &[],
                 &Default::default()
             ),
-            Some(&(
-                Order {
+            Some(&OrderWrap {
+                order: Order {
                     side: "buy".to_string(),
                     qty: 1.,
                     ..Default::default()
                 },
-                Default::default(),
-                Default::default()
-            ))
+                ..Default::default()
+            })
         );
     }
 }

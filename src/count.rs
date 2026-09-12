@@ -37,18 +37,18 @@ impl OrderFilter for COUNT {
     }
     fn filter<'a>(
         &self,
-        orders: &[Option<&'a (Order, bool, Option<Trigger>)>],
+        orders: &[Option<&'a bc_utils_lg::structs::trade::OrderWrap>],
         _src: &[f64],
         _signals: &[Signal],
         state: &TradeState,
-    ) -> Option<&'a (Order, bool, Option<Trigger>)> {
+    ) -> Option<&'a bc_utils_lg::structs::trade::OrderWrap> {
         if state.positions.borrow().is_empty() {
             *self.bf.borrow_mut() = Default::default();
         }
         let count_res = orders.len() + self.bf.borrow().count;
         if count_res <= self.params.max_count {
             self.bf.borrow_mut().count += 1;
-            *orders.get(0).unwrap()
+            orders[0]
         } else {
             None
         }
@@ -69,37 +69,37 @@ mod tests {
         let count = BIND();
         assert_eq_pr!(
             count.filter(
-                &[Some(&(Default::default()))],
+                &[Some(&Default::default())],
                 &[],
                 &[],
                 &TradeState {
                     positions: RefCell::new(MAP::from_iter([(1, Default::default())])),
                     ..Default::default()
-                }
+                },
             ),
-            Some(&(Default::default()))
+            Some(&Default::default())
         );
         assert_eq_pr!(
             count.filter(
-                &[Some(&(Default::default()))],
+                &[Some(&Default::default())],
                 &[],
                 &[],
                 &TradeState {
                     positions: RefCell::new(MAP::from_iter([(1, Default::default())])),
                     ..Default::default()
-                }
+                },
             ),
-            Some(&(Default::default()))
+            Some(&Default::default())
         );
         assert_eq_pr!(
             count.filter(
-                &[Some(&(Default::default()))],
+                &[Some(&Default::default())],
                 &[],
                 &[],
                 &TradeState {
                     positions: RefCell::new(MAP::from_iter([(1, Default::default())])),
                     ..Default::default()
-                }
+                },
             ),
             None
         );
@@ -109,22 +109,12 @@ mod tests {
     fn filter_res_2() {
         let count = BIND();
         assert_eq_pr!(
-            count.filter(
-                &[Some(&(Default::default()))],
-                &[],
-                &[],
-                &Default::default(),
-            ),
-            Some(&(Default::default()))
+            count.filter(&[Some(&Default::default())], &[], &[], &Default::default(),),
+            Some(&Default::default())
         );
         assert_eq_pr!(
-            count.filter(
-                &[Some(&(Default::default()))],
-                &[],
-                &[],
-                &Default::default(),
-            ),
-            Some(&(Default::default()))
+            count.filter(&[Some(&Default::default())], &[], &[], &Default::default(),),
+            Some(&Default::default())
         );
     }
 
@@ -132,24 +122,19 @@ mod tests {
     fn filter_res_3() {
         let count = COUNT::new(1);
         assert_eq_pr!(
-            count.filter(
-                &[Some(&(Default::default()))],
-                &[],
-                &[],
-                &Default::default(),
-            ),
-            Some(&(Default::default()))
+            count.filter(&[Some(&Default::default())], &[], &[], &Default::default(),),
+            Some(&Default::default())
         );
         dbg!(count.bf.borrow());
         assert_eq_pr!(
             count.filter(
-                &[Some(&(Default::default()))],
+                &[Some(&Default::default())],
                 &[],
                 &[],
                 &TradeState {
                     positions: RefCell::new(MAP::from_iter([(1, Default::default())])),
                     ..Default::default()
-                }
+                },
             ),
             None
         );
