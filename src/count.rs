@@ -37,11 +37,11 @@ impl OrderFilter for COUNT {
     }
     fn filter<'a>(
         &self,
-        orders: &[Option<&'a bc_utils_lg::structs::trade::OrderWrap>],
+        orders: &[Option<&'a OrderWrap>],
         _src: &[f64],
         _signals: &[Signal],
         state: &TradeState,
-    ) -> Option<&'a bc_utils_lg::structs::trade::OrderWrap> {
+    ) -> Option<&'a OrderWrap> {
         if state.positions.borrow().is_empty() {
             *self.bf.borrow_mut() = Default::default();
         }

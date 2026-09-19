@@ -1,11 +1,6 @@
 #![allow(non_camel_case_types)]
 
-use std::any::Any;
-
-use bc_utils_lg::structs::{
-    signals::Signal,
-    trade::{OrderWrap, TradeState},
-};
+use crate::prelude::*;
 
 pub trait OrderFilter: Any {
     fn init_bf(&self);
